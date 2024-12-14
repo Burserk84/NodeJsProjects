@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fa">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>چت آنلاین</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="chat-container">
+      <div class="chat-header">
+        <h1>چت آنلاین</h1>
+        <p>کاربران آنلاین: <span id="online-count">0</span></p>
+      </div>
+      <div class="chat-messages" id="messages"></div>
+      <form id="chat-form">
+        <input
+          id="message-input"
+          placeholder="پیام خود را وارد کنید..."
+          autocomplete="off"
+          required
+        />
+        <button type="submit">ارسال</button>
+      </form>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
