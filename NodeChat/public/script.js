@@ -1,32 +1,55 @@
 const socket = io();
 
-// نام کاربری را تنظیم کن
-const username = prompt("نام کاربری خود را وارد کنید:") || "ناشناس";
-socket.emit("set username", username);
+const loginContainer = document.getElementById("login-container");
+const chatContainer = document.getElementById("chat-container");
+const loginBtn = document.getElementById("login-btn");
+const usernameInput = document.getElementById("username");
 
-// نمایش پیام‌ها
+const messages = document.getElementById("messages");
+const form = document.getElementById("form");
+const input = document.getElementById("input");
+
+let username = "";
+
+// نمایش پیام در صفحه
+function appendMessage(data) {
+  const item = document.createElement("div");
+  item.innerHTML = `<strong>${data.username}</strong> [${data.time}]: ${data.message}`;
+  messages.appendChild(item);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+// دریافت تاریخچه پیام‌ها
+socket.on("message history", (history) => {
+  messages.innerHTML = "";
+  history.forEach(appendMessage);
+});
+
+// دریافت پیام جدید از سرور
 socket.on("chat message", (data) => {
-  const { username, message, time } = data;
-  const messagesDiv = document.getElementById("messages");
-  const messageDiv = document.createElement("div");
-  messageDiv.innerHTML = `<strong>${username}:</strong> ${message} <span style="font-size: 0.8em; color: gray;">[${time}]</span>`;
-  messagesDiv.appendChild(messageDiv);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  appendMessage(data);
 });
 
-// تعداد کاربران آنلاین
-socket.on("update users", (users) => {
-  document.getElementById("online-count").textContent = users.length;
+// مدیریت لاگین
+loginBtn.addEventListener("click", () => {
+  const enteredUsername = usernameInput.value.trim();
+  if (!enteredUsername) {
+    alert("لطفاً نام کاربری وارد کنید!");
+    return;
+  }
+
+  username = enteredUsername;
+  socket.emit("set username", username);
+
+  loginContainer.style.display = "none";
+  chatContainer.style.display = "block";
 });
 
-// ارسال پیام
-const form = document.getElementById("chat-form");
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const input = document.getElementById("message-input");
-  const message = input.value.trim();
-  if (message) {
-    socket.emit("chat message", message);
+// ارسال پیام به سرور
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (input.value) {
+    socket.emit("chat message", input.value);
     input.value = "";
   }
 });
